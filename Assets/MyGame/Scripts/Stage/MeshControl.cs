@@ -1,12 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 /// <summary>
 /// メッシュ操作を行うクラス
 /// </summary>
 public class MeshControl
 {
+    /// <summary> メッシュ保存先 </summary>
+    private const string FIRE_PATH = "Assets/MyGame/Meshs/";
     /// <summary>
     /// 指定オブジェクトの子オブジェクトのメッシュを結合する
     /// </summary>
@@ -57,4 +60,17 @@ public class MeshControl
             combRenderer.material = materialDic[filterList.Key];
         }
     }
+
+#if UNITY_EDITOR
+    /// <summary>
+    /// メッシュをEditorに保存する
+    /// </summary>
+    /// <param name="meshName"></param>
+    /// <param name="meshFilter"></param>
+    public static void CreateMesh(string meshName, MeshFilter meshFilter)
+    {
+        AssetDatabase.CreateAsset(meshFilter.mesh, FIRE_PATH + meshName + ".asset");
+        AssetDatabase.SaveAssets();
+    }
+#endif
 }
