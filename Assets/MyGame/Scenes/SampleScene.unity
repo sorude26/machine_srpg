@@ -538,10 +538,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _base: {fileID: 566858719}
-  _stagePrefab: {fileID: 6540409676531327231, guid: c394197b3c805ce44aec08e095c2d927, type: 3}
+  _stagePrefab: {fileID: 6113610116804514894, guid: c394197b3c805ce44aec08e095c2d927, type: 3}
   _stageScale: 8
-  _maxSize: 15
-  _level: 2
+  _maxSize: 50
+  _level: 9
+  _scale: 0.5
 --- !u!4 &1451776545
 Transform:
   m_ObjectHideFlags: 0
