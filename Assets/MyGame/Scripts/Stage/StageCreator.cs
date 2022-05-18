@@ -7,13 +7,15 @@ public class StageCreator : MonoBehaviour
     [SerializeField]
     private Transform _base = default;
     [SerializeField]
-    private GameObject _stagePrefab = default;
+    private StagePoint _stagePrefab = default;
     [SerializeField]
     private float _stageScale = 1f;
     [SerializeField]
     private int _maxSize = 15;
     [SerializeField]
-    private float _level = 0.5f;
+    private int _level = 2;
+    [SerializeField]
+    private float _scale = 0.5f;
     public void CreateStage()
     {
         for (int y = 0; y < _maxSize; y++)
@@ -21,10 +23,11 @@ public class StageCreator : MonoBehaviour
             for (int x = 0; x < _maxSize; x++)
             {
                 var stage = Instantiate(_stagePrefab, _base);
-                stage.transform.position = new Vector3(_stageScale * x, Random.Range(0,_level), _stageScale * y);
+                float level = Random.Range(0, _level) * _scale;
+                stage.transform.position = new Vector3(_stageScale * x, level, _stageScale * y);
+                stage.Pos = (x, y, level);
             }
         }
         MeshControl.Combine(transform);
-        _base.gameObject.SetActive(false);
     }
 }

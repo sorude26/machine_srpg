@@ -37,6 +37,10 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     /// <summary> 目標座標までの道のり </summary>
     private Stack<Point> _route;
     #endregion
+    #region PublicField
+    /// <summary> 昇降能力 </summary>
+    public int LiftingPower;
+    #endregion
     #region Property
     /// <summary> 座標データ </summary>
     public Point[] MapData { get; }
@@ -73,6 +77,8 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         public (int x, int y) Parent;
         /// <summary> 探索用状態 </summary>
         public SearchStateType State;
+        /// <summary> 高度 </summary>
+        public int Level;
         #endregion
         #region Property
         /// <summary> 座標 </summary>
@@ -155,6 +161,8 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     {
         foreach (var neighorPoint in GetNeighorMap(point))
         {
+            //高低差が昇降力を超える時は足跡を付けない
+            if (Difference(point.Level, neighorPoint.Level) > LiftingPower) { continue; }
             MakeFootprintsPoint(neighorPoint, movePower);
         }
     }
@@ -201,6 +209,8 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     /// <returns></returns>
     private bool CheckPoint(Point point, Point parent)
     {
+        //高低差が昇降力を超える時は侵入不可
+        if (Difference(point.Level, parent.Level) > LiftingPower) { return false; }
         //目標地点であれば終了
         if (point.Pos == _target)
         {
@@ -216,8 +226,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         {
             point.State = SearchStateType.Open;
             //探索座標の評価を付ける
-            Func<int,int,int> ads = (int x, int y) => x > y ? x - y : y - x;
-            point.DistanceCost = ads(point.X, _target.x) + ads(point.Y, _target.y);//単純な距離
+            point.DistanceCost = Difference(point.X, _target.x) + Difference(point.Y, _target.y);//単純な距離
             point.Cost = parent.Cost + point.MoveCost;//移動コスト計算
             point.TotalCost = point.DistanceCost + point.Cost;//座標の評価
             point.Parent = parent.Pos;
@@ -267,29 +276,12 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         return SaveRoutePoint(this[point.Parent]);
     }
     /// <summary>
-    /// 指定座標の周囲の座標を返す
+    /// 差の値を返す
     /// </summary>
-    /// <param name="point"></param>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
     /// <returns></returns>
-    public IEnumerable<Point> GetNeighorMap(Point point)
-    {
-        if (point.Y > 0 && point.Y < MAX_Y)//上
-        {
-            yield return this[point.X, point.Y - 1];
-        }
-        if (point.Y >= 0 && point.Y < MAX_Y - 1)//下
-        {
-            yield return this[point.X, point.Y + 1];
-        }
-        if (point.X > 0 && point.X < MAX_X)//右
-        {
-            yield return this[point.X - 1, point.Y];
-        }
-        if (point.X >= 0 && point.X < MAX_X - 1)//左
-        {
-            yield return this[point.X + 1, point.Y];
-        }
-    }
+    private int Difference(int x, int y) => x > y? x - y : y - x;
     #endregion
     #region PublicMethod
     /// <summary>
@@ -339,6 +331,30 @@ public class SearchMap : IEnumerable<SearchMap.Point>
             return true;
         }
         return false;
+    }
+    /// <summary>
+    /// 指定座標の周囲の座標を返す
+    /// </summary>
+    /// <param name="point"></param>
+    /// <returns></returns>
+    public IEnumerable<Point> GetNeighorMap(Point point)
+    {
+        if (point.Y > 0 && point.Y < MAX_Y)//上
+        {
+            yield return this[point.X, point.Y - 1];
+        }
+        if (point.Y >= 0 && point.Y < MAX_Y - 1)//下
+        {
+            yield return this[point.X, point.Y + 1];
+        }
+        if (point.X > 0 && point.X < MAX_X)//右
+        {
+            yield return this[point.X - 1, point.Y];
+        }
+        if (point.X >= 0 && point.X < MAX_X - 1)//左
+        {
+            yield return this[point.X + 1, point.Y];
+        }
     }
     #region IEnumerator
     IEnumerator IEnumerable.GetEnumerator()
