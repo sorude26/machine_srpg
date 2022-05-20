@@ -17,38 +17,66 @@ public class StageCreator : MonoBehaviour
     [SerializeField]
     private int _maxSize = 15;
     [SerializeField]
-    private int _level = 2;
-    [SerializeField]
     private float _scale = 0.5f;
+    [SerializeField]
+    PieceController _testPlayer = default;
+    [SerializeField]
+    Vector2Int _playerPosition = default;
+    [SerializeField]
+    Transform _cameraTarget = default;
     private int[] _levels = default;
+    private int[] _levelsAll = default;
+    private int[] _costs = default;
     private int _stageSizeX = default;
     private int _stageSizeY = default;
+    private StagePoint[] _stagePoints = default;
+    PieceController _player = default;
+    public float StageScale { get => _stageScale; }
+    public float Scale { get => _scale; }
+    public int MaxSize { get => _maxSize; }
+    public int[] Levels { get => _levels; }
+    public int[] Costs { get => _costs; }
+    public int StageSizeX { get; private set; }
+    public int StageSizeY { get; private set; }
     public void CreateStage()
     {
-        int startX = (_stageSizeX - _maxSize) / 2;
-        int startY = (_stageSizeY - _maxSize) / 2;
-        for (int y = startY; y < startY + _maxSize; y++)
+        _player = Instantiate(_testPlayer);
+        StageSizeX = (_stageSizeX - _maxSize) / 2;
+        StageSizeY = (_stageSizeY - _maxSize) / 2;
+        _costs = new int[_maxSize * _maxSize];
+        _levels = new int[_maxSize * _maxSize];
+        _stagePoints = new StagePoint[_maxSize * _maxSize];
+        for (int y = StageSizeY; y < StageSizeY + _maxSize; y++)
         {
-            for (int x = startX; x < startX + _maxSize; x++)
+            for (int x = StageSizeX; x < StageSizeX + _maxSize; x++)
             {
                 var stage = Instantiate(_pointPrefab, _stageBase);
-                float level = _levels[x + y * _stageSizeX] * _scale; ;
+                float level = _levelsAll[x + y * _stageSizeX] * _scale; ;
                 stage.transform.position = new Vector3(_stageScale * x, level, _stageScale * y);
-                stage.Pos = (x - startX, y - startY, level);
+                stage.Pos = (x - StageSizeX, y - StageSizeY);
+                _stagePoints[x - StageSizeX + (y - StageSizeY) * _maxSize] = stage;
+                _costs[x - StageSizeX + (y - StageSizeY) * _maxSize] = 1;
+                _levels[x - StageSizeX + (y - StageSizeY) * _maxSize] = _levelsAll[x + y * _stageSizeX];
+                stage.DelSelect += _player.StartMove;
             }
         }
+        (int x, int y) start;
+        start.x = _playerPosition.x;
+        start.y = _playerPosition.y;
+        _player.StartSet(this, start);
+        _cameraTarget.position = _player.transform.position;
+        _cameraTarget.SetParent(_player.transform);
         //MeshControl.Combine(transform);
     }
     public void CreateStage(int sizeX,int sizeY, int[] levels)
     {
-        _levels = levels;
+        _levelsAll = levels;
         for (int y = 0; y < sizeY; y++)
         {
             for (int x = 0; x < sizeX; x++)
             {
                 var stage = Instantiate(_stagePrefab, _base);
-                float level = _levels[x + y * sizeX] * _scale;
-                stage.transform.position = new Vector3(_stageScale * x, level, _stageScale * y);
+                stage.transform.position = new Vector3(_stageScale * x, _levelsAll[x + y * sizeX] * _scale, _stageScale * y);
             }
         }
         _stageSizeX = sizeX;
@@ -56,5 +84,13 @@ public class StageCreator : MonoBehaviour
         MeshControl.Combine(transform);
         _base.gameObject.SetActive(false);
         CreateStage();
+    }
+    public StagePoint GetPoint((int x,int y) pos)
+    {
+        return _stagePoints[pos.x + pos.y * _maxSize];
+    }
+    public void Search()
+    {
+        _player.Search();
     }
 }
