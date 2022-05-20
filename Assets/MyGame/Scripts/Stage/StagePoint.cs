@@ -7,12 +7,13 @@ public class StagePoint : MonoBehaviour
 {
     [SerializeField]
     private GameObject _selectMark = default; 
-    public (int x, int y,float level) Pos;
-    public event Action<(int, int,float)> DelSelect = default;
+    public (int x, int y) Pos;
+    public event Action<(int, int)> DelSelect = default;
+    private bool _isOpen = false;
     private void OnMouseDown()
     {
+        if (!_isOpen) { return; }
         Debug.Log(Pos);
-        OpenMark();
         DelSelect?.Invoke(Pos);
     }
     public void OpenMark()
@@ -20,6 +21,7 @@ public class StagePoint : MonoBehaviour
         if (_selectMark != null)
         {
             _selectMark.SetActive(true);
+            _isOpen = true;
         }
     }
     public void CloseMark()
@@ -27,6 +29,7 @@ public class StagePoint : MonoBehaviour
         if (_selectMark != null)
         {
             _selectMark.SetActive(false);
+            _isOpen = false;
         }
     }
 }
