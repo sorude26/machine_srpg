@@ -40,6 +40,8 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     #region PublicField
     /// <summary> 昇降能力 </summary>
     public int LiftingPower;
+
+    public List<(int x, int y)> FootprintsPoints = default;
     #endregion
     #region Property
     /// <summary> 座標データ </summary>
@@ -122,6 +124,15 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         _route = new Stack<Point>();
         CreateMap(costData);
     }
+    public SearchMap(int maxX,int maxY, int[] costData,int[] levels)
+    {
+        MAX_X = maxX;
+        MAX_Y = maxY;
+        MapData = new Point[maxX * maxY];
+        _route = new Stack<Point>();
+        CreateMap(costData, levels);
+        FootprintsPoints = new List<(int,int)>();
+    }
     #endregion
     #endregion
     #region PrivateMethod
@@ -152,6 +163,17 @@ public class SearchMap : IEnumerable<SearchMap.Point>
             }
         }
     }
+    private void CreateMap(int[] costData,int[] levels)
+    {
+        for (int y = 0; y < MAX_Y; y++)
+        {
+            for (int x = 0; x < MAX_X; x++)
+            {
+                MapData[x + y * MAX_X] = new Point(x, y, costData[x + y * MAX_X]);
+                MapData[x + y * MAX_X].Level = levels[x + y * MAX_X];
+            }
+        }
+    }
     /// <summary>
     /// 指定地点の周囲に足跡を付ける
     /// </summary>
@@ -163,7 +185,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         {
             //高低差が昇降力を超える時は足跡を付けない
             if (Difference(point.Level, neighorPoint.Level) > LiftingPower) { continue; }
-            MakeFootprintsPoint(neighorPoint, movePower);
+            MakeFootprintsPoint(neighorPoint, movePower, point.Pos);
         }
     }
     /// <summary>
@@ -171,12 +193,15 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     /// </summary>
     /// <param name="point"></param>
     /// <param name="movePower"></param>
-    private void MakeFootprintsPoint(Point point, int movePower)
+    private void MakeFootprintsPoint(Point point, int movePower,(int,int) parent)
     {
         //指定地点への移動コストを引いた移動力がその座標の足跡より高い時のみ足跡を付ける
         if (movePower - point.MoveCost <= point.Footprints) { return; }
         //足跡を付ける
         point.Footprints = movePower - point.MoveCost;
+        //一つ前の座標を登録
+        point.Parent = parent;
+        FootprintsPoints.Add(point.Pos);
         //足跡0以下で終了
         if (point.Footprints <= 0) { return; }
         //再度周囲に足跡を付ける
@@ -292,11 +317,14 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     public void MakeFootprints((int x, int y) startPoint, int movePower)
     {
         //足跡の初期化
-        foreach (var mapPoint in MapData)
+        foreach (var point in MapData)
         {
-            mapPoint.Footprints = START_FOOTPRINTS;
+            point.Footprints = START_FOOTPRINTS;
+            point.Parent = NG_POINT;
         }
+        FootprintsPoints.Clear();
         this[startPoint].Footprints = movePower;
+        FootprintsPoints.Add(startPoint);
         MakeFootprintsNeighor(this[startPoint], movePower);
     }
     /// <summary>
@@ -354,6 +382,20 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         if (point.X >= 0 && point.X < MAX_X - 1)//左
         {
             yield return this[point.X + 1, point.Y];
+        }
+    }
+    /// <summary>
+    /// 指定地点までの道のりを返す
+    /// </summary>
+    /// <param name="targetPoint"></param>
+    /// <returns></returns>
+    public IEnumerable<(int x, int y)> GetRoutePoints((int x, int y) targetPoint)
+    {
+        while (true)
+        {
+            yield return this[targetPoint].Pos;
+            if (this[targetPoint].Parent == NG_POINT) { break; }
+            targetPoint = this[targetPoint].Parent;
         }
     }
     #region IEnumerator
