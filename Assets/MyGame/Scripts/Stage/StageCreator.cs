@@ -11,7 +11,7 @@ public class StageCreator : MonoBehaviour
     [SerializeField]
     private StagePoint _pointPrefab = default;
     [SerializeField]
-    private GameObject _stagePrefab = default;
+    private GameObject[] _stagePrefab = default;
     [SerializeField]
     private float _stageScale = 1f;
     [SerializeField]
@@ -27,6 +27,7 @@ public class StageCreator : MonoBehaviour
     private int[] _levels = default;
     private int[] _levelsAll = default;
     private int[] _costs = default;
+    private int[] _costsAll = default;
     private int _stageSizeX = default;
     private int _stageSizeY = default;
     private StagePoint[] _stagePoints = default;
@@ -55,7 +56,7 @@ public class StageCreator : MonoBehaviour
                 stage.transform.position = new Vector3(_stageScale * x, level, _stageScale * y);
                 stage.Pos = (x - StageSizeX, y - StageSizeY);
                 _stagePoints[x - StageSizeX + (y - StageSizeY) * _maxSize] = stage;
-                _costs[x - StageSizeX + (y - StageSizeY) * _maxSize] = 1;
+                _costs[x - StageSizeX + (y - StageSizeY) * _maxSize] = 1 + _costsAll[x + y * _stageSizeX];
                 _levels[x - StageSizeX + (y - StageSizeY) * _maxSize] = _levelsAll[x + y * _stageSizeX];
                 stage.DelSelect += _player.StartMove;
             }
@@ -68,14 +69,15 @@ public class StageCreator : MonoBehaviour
         _cameraTarget.SetParent(_player.transform);
         //MeshControl.Combine(transform);
     }
-    public void CreateStage(int sizeX,int sizeY, int[] levels)
+    public void CreateStage(int sizeX,int sizeY, int[] levels,int[] costs)
     {
         _levelsAll = levels;
+        _costsAll = costs;
         for (int y = 0; y < sizeY; y++)
         {
             for (int x = 0; x < sizeX; x++)
             {
-                var stage = Instantiate(_stagePrefab, _base);
+                var stage = Instantiate(_stagePrefab[_costsAll[x + y * sizeX]], _base);
                 stage.transform.position = new Vector3(_stageScale * x, _levelsAll[x + y * sizeX] * _scale, _stageScale * y);
             }
         }
