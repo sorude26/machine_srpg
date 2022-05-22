@@ -61,6 +61,10 @@ public class PieceMoveController : MonoBehaviour
     }
     void SetAngle()
     {
+        if (_targetPos == transform.position)
+        {
+            return;
+        }
         var p = _targetPos - transform.position;
         p.y = 0;
         transform.forward = p.normalized;
