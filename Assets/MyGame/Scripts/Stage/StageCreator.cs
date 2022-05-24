@@ -52,7 +52,7 @@ public class StageCreator : MonoBehaviour
             for (int x = StageSizeX; x < StageSizeX + _maxSize; x++)
             {
                 var stage = Instantiate(_pointPrefab, _stageBase);
-                float level = _levelsAll[x + y * _stageSizeX] * _scale; ;
+                float level = _levelsAll[x + y * _stageSizeX] * _scale;
                 stage.transform.position = new Vector3(_stageScale * x, level, _stageScale * y);
                 stage.Pos = (x - StageSizeX, y - StageSizeY);
                 _stagePoints[x - StageSizeX + (y - StageSizeY) * _maxSize] = stage;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -54,13 +55,13 @@ public class MeshControl
             }
             //結合処理
             combFilter.mesh = new Mesh();
-            combFilter.mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;//PC用
+            combFilter.mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;//頂点数がオーバーフローするため、変更
             combFilter.mesh.CombineMeshes(combines);
             //Material反映
             combRenderer.material = materialDic[filterList.Key];
         }
     }
-
+    
 #if UNITY_EDITOR
     /// <summary>
     /// メッシュをEditorに保存する
