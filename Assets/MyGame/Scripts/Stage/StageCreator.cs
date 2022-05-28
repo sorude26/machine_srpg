@@ -11,7 +11,7 @@ public class StageCreator : MonoBehaviour
     [SerializeField]
     private StagePoint _pointPrefab = default;
     [SerializeField]
-    private GameObject[] _stagePrefab = default;
+    private TerrainMeshCreator[] _stagePrefab = default;
     [SerializeField]
     private float _stageScale = 1f;
     [SerializeField]
@@ -37,13 +37,11 @@ public class StageCreator : MonoBehaviour
     public int MaxSize { get => _maxSize; }
     public int[] Levels { get => _levels; }
     public int[] Costs { get => _costs; }
-    public int StageSizeX { get; private set; }
-    public int StageSizeY { get; private set; }
+    private int StageSizeX;
+    private int StageSizeY;
     public void CreateStage()
     {
         _player = Instantiate(_testPlayer);
-        StageSizeX = (_stageSizeX - _maxSize) / 2;
-        StageSizeY = (_stageSizeY - _maxSize) / 2;
         _costs = new int[_maxSize * _maxSize];
         _levels = new int[_maxSize * _maxSize];
         _stagePoints = new StagePoint[_maxSize * _maxSize];
@@ -53,7 +51,7 @@ public class StageCreator : MonoBehaviour
             {
                 var stage = Instantiate(_pointPrefab, _stageBase);
                 float level = _levelsAll[x + y * _stageSizeX] * _scale;
-                stage.transform.position = new Vector3(_stageScale * x, level, _stageScale * y);
+                stage.transform.position = new Vector3(_stageScale * (x -StageSizeX), level, _stageScale * (y - StageSizeY));
                 stage.Pos = (x - StageSizeX, y - StageSizeY);
                 _stagePoints[x - StageSizeX + (y - StageSizeY) * _maxSize] = stage;
                 _costs[x - StageSizeX + (y - StageSizeY) * _maxSize] = 1 + _costsAll[x + y * _stageSizeX];
@@ -73,16 +71,39 @@ public class StageCreator : MonoBehaviour
     {
         _levelsAll = levels;
         _costsAll = costs;
+        _stageSizeX = sizeX;
+        _stageSizeY = sizeY;
+        StageSizeX = (_stageSizeX - _maxSize) / 2;
+        StageSizeY = (_stageSizeY - _maxSize) / 2;
         for (int y = 0; y < sizeY; y++)
         {
             for (int x = 0; x < sizeX; x++)
             {
                 var stage = Instantiate(_stagePrefab[_costsAll[x + y * sizeX]], _base);
-                stage.transform.position = new Vector3(_stageScale * x, _levelsAll[x + y * sizeX] * _scale, _stageScale * y);
+                stage.transform.position = new Vector3(_stageScale * (x - StageSizeX), _levelsAll[x + y * sizeX] * _scale, _stageScale * (y - StageSizeY));
+                float forwrd = _levelsAll[x + y * sizeX] * _scale;
+                float back = forwrd;
+                float left = forwrd;
+                float right = forwrd;
+                if (y >= 0 && y < sizeY - 1)//‰œ
+                {
+                    forwrd -= _levelsAll[x + (y + 1) * sizeX] * _scale;
+                }
+                if (y > 0 && y < sizeY)//‘O
+                {
+                    back -= _levelsAll[x + (y - 1) * sizeX] * _scale;
+                }
+                if (x > 0 && x < sizeX)//¶
+                {
+                    left -= _levelsAll[x - 1 + y * sizeX] * _scale;
+                }
+                if (x >= 0 && x < sizeX - 1)//‰E
+                {
+                    right -= _levelsAll[x + 1 + y * sizeX] * _scale;
+                }
+                stage.CreateTerrain(forwrd, back, left, right, _stageScale);
             }
         }
-        _stageSizeX = sizeX;
-        _stageSizeY = sizeY;
         MeshControl.Combine(transform);
         _base.gameObject.SetActive(false);
         CreateStage();
