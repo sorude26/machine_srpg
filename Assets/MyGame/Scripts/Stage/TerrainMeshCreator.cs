@@ -9,7 +9,7 @@ public class TerrainMeshCreator : MonoBehaviour
 
     private float height = 1;
     private float top = 0;
-
+    private int count = 0;
     private Vector3[] GetVertices(float size, int a)
     {
         if (a == 1)
@@ -61,8 +61,8 @@ public class TerrainMeshCreator : MonoBehaviour
     {
         int[] tris = new int[6]
         {
-            1, 2, 0,
-            1, 3, 2
+            1 + count, 2 + count, 0 + count,
+            1 + count, 3 + count, 2 + count
         };
         return tris;
     }
@@ -114,36 +114,55 @@ public class TerrainMeshCreator : MonoBehaviour
         meshFilters.mesh.normals = GetNormals(angle);
         meshFilters.mesh.uv = GetUv();
     }
+    private void SetMeshData(int angle,float size,List<Vector3> verticesList,List<int> trianglesList,List<Vector3> normalList, List<Vector2> uvList)
+    {
+        foreach (var item in GetVertices(size / 2, angle))
+        {
+            verticesList.Add(item);
+        }
+        foreach (var item in GetTris())
+        {
+            trianglesList.Add(item);
+        }
+        foreach (var item in GetNormals(angle))
+        {
+            normalList.Add(item);
+        }
+        foreach (var item in GetUv())
+        {
+            uvList.Add(item);
+        }
+    }
     public void CreateTerrain(float forwrd, float back, float left, float right, float size)
     {
         height = size;
-        top = 0;
-        while (forwrd > 0)
+        count = 0;
+        float[] angles = new float[4] { forwrd, back, left, right };
+        List<Vector3> verticesList = new List<Vector3>();
+        List<int> trianglesList = new List<int>();
+        List<Vector3> normalList = new List<Vector3>();
+        List<Vector2> uvList = new List<Vector2>();
+        for (int i = 0; i < angles.Length; i++)
         {
-            CreatePanel(size, 0);
-            forwrd -= size;
-            top -= size;
+            top = 0;
+            while (angles[i] > 0)
+            {
+                SetMeshData(i, size, verticesList, trianglesList, normalList, uvList);
+                angles[i] -= size;
+                top -= size;
+                count += 4;
+            }
         }
-        top = 0;
-        while (back > 0)
-        {
-            CreatePanel(size, 1);
-            back -= size;
-            top -= size;
-        }
-        top = 0;
-        while (left > 0)
-        {
-            CreatePanel(size, 2);
-            left -= size;
-            top -= size;
-        }
-        top = 0;
-        while (right > 0)
-        {
-            CreatePanel(size, 3);
-            right -= size;
-            top -= size;
-        }
+        var obj = new GameObject($"(Comb:{size})");
+        obj.transform.SetParent(transform);
+        obj.transform.localPosition = Vector3.zero;
+        var combRenderer = obj.AddComponent<MeshRenderer>();
+        combRenderer.material = _terrainMaterial;
+        var meshFilters = obj.AddComponent<MeshFilter>();
+        meshFilters.mesh = new Mesh();
+        meshFilters.mesh.vertices = verticesList.ToArray();
+        meshFilters.mesh.triangles = trianglesList.ToArray();
+        meshFilters.mesh.normals = normalList.ToArray();
+        meshFilters.mesh.uv = uvList.ToArray();
     }
 }
