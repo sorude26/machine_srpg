@@ -52,14 +52,14 @@ public class StageCreator : MonoBehaviour
                 var stage = Instantiate(_pointPrefab, _stageBase);
                 float level = _levelsAll[x + y * _stageSizeX] * _scale;
                 stage.transform.position = new Vector3(_stageScale * (x -StageSizeX), level, _stageScale * (y - StageSizeY));
-                stage.Pos = (x - StageSizeX, y - StageSizeY);
+                stage.Pos = new Vector2Int(x - StageSizeX, y - StageSizeY);
                 _stagePoints[x - StageSizeX + (y - StageSizeY) * _maxSize] = stage;
                 _costs[x - StageSizeX + (y - StageSizeY) * _maxSize] = 1 + _costsAll[x + y * _stageSizeX];
                 _levels[x - StageSizeX + (y - StageSizeY) * _maxSize] = _levelsAll[x + y * _stageSizeX];
                 stage.DelSelect += _player.StartMove;
             }
         }
-        (int x, int y) start;
+        Vector2Int start = new Vector2Int();
         start.x = _playerPosition.x;
         start.y = _playerPosition.y;
         _player.StartSet(this, start);
@@ -108,7 +108,7 @@ public class StageCreator : MonoBehaviour
         _base.gameObject.SetActive(false);
         CreateStage();
     }
-    public StagePoint GetPoint((int x,int y) pos)
+    public StagePoint GetPoint(Vector2Int pos)
     {
         return _stagePoints[pos.x + pos.y * _maxSize];
     }

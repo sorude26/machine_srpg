@@ -7,8 +7,8 @@ public class StagePoint : MonoBehaviour
 {
     [SerializeField]
     private GameObject _selectMark = default; 
-    public (int x, int y) Pos;
-    public event Action<(int, int)> DelSelect = default;
+    public Vector2Int Pos;
+    public event Action<Vector2Int> DelSelect = default;
     private bool _isOpen = false;
     private void OnMouseDown()
     {

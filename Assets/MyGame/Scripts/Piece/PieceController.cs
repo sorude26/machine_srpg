@@ -9,34 +9,36 @@ public class PieceController : MonoBehaviour
     private int _movePower = 5;
     [SerializeField]
     private int _liftingPower = 5;
+    public Transform _base = default;
     private SearchMap _searchMap = default;
     private PieceMoveController _moveController = default;
     private StageCreator _stage = default;
-    private (int x, int y) _currentPos = default;
-    public void StartSet(StageCreator stage,(int x,int y) startPos)
+    public Vector2Int CurrentPos { get; protected set; }
+    public void StartSet(StageCreator stage, Vector2Int startPos)
     {
         _moveController = GetComponent<PieceMoveController>();
         _searchMap = new SearchMap(stage.MaxSize, stage.MaxSize, stage.Costs, stage.Levels);
         _searchMap.LiftingPower = _liftingPower;
-        _currentPos = startPos;
-        _stage = stage;
-        _moveController.Warp(new Vector3((_currentPos.x + _stage.StageSizeX) * _stage.StageScale, _stage.Levels[_currentPos.x + _currentPos.y * _stage.MaxSize] * _stage.Scale, (_currentPos.y + _stage.StageSizeY) * _stage.StageScale));
+        CurrentPos = startPos;
+        _stage = stage; 
+        MeshControl.Combine(_base);
+        _moveController.Warp(new Vector3(CurrentPos.x * _stage.StageScale, _stage.Levels[CurrentPos.x + CurrentPos.y * _stage.MaxSize] * _stage.Scale, CurrentPos.y  * _stage.StageScale));
     }
     public void Search()
     {
-        if (_moveController.IsMove)
+        if (_moveController.IsMoveing)
         {
             return;
         }
-        _searchMap.MakeFootprints(_currentPos, _movePower);
+        _searchMap.MakeFootprints(CurrentPos, _movePower);
         foreach (var point in _searchMap.FootprintsPoints)
         {
             _stage.GetPoint(point).OpenMark();
         }
     }
-    public void StartMove((int x,int y) target) 
+    public void StartMove(Vector2Int target) 
     {
-        if (_moveController.IsMove)
+        if (_moveController.IsMoveing)
         {
             return;
         }
@@ -46,9 +48,9 @@ public class PieceController : MonoBehaviour
         }
         foreach (var point in _searchMap.GetRoutePoints(target))
         {
-            _moveController.MovePoints.Push(new Vector3((point.x + _stage.StageSizeX) * _stage.StageScale, _stage.Levels[point.x + point.y * _stage.MaxSize] * _stage.Scale, (point.y + _stage.StageSizeY) * _stage.StageScale));
+            _moveController.MovePoints.Push(new Vector3(point.x * _stage.StageScale, _stage.Levels[point.x + point.y * _stage.MaxSize] * _stage.Scale, point.y * _stage.StageScale));
         }
         StartCoroutine(_moveController.Move());
-        _currentPos = target;
+        CurrentPos = target;
     }
 }

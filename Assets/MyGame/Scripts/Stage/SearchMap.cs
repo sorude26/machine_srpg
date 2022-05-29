@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// 探索マップ
@@ -25,7 +26,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     /// <summary> 移動不可の座標のコスト </summary>
     public const int CANNOT_MOVE_COST = 9999;
     /// <summary> 移動不可の座標 </summary>
-    private readonly (int, int) NG_POINT = (-1, -1);
+    private readonly Vector2Int NG_POINT = new Vector2Int(-1, -1);
     /// <summary> 最大X座標 </summary>
     public readonly int MAX_X;
     /// <summary> 最大Y座標 </summary>
@@ -33,7 +34,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     #endregion
     #region PrivateField
     /// <summary> 探索用目標座標 </summary>
-    private (int x, int y) _target;
+    private Vector2Int _target;
     /// <summary> 目標座標までの道のり </summary>
     private Stack<Point> _route;
     #endregion
@@ -41,7 +42,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     /// <summary> 昇降能力 </summary>
     public int LiftingPower;
 
-    public List<(int x, int y)> FootprintsPoints = default;
+    public List<Vector2Int> FootprintsPoints = default;
     #endregion
     #region Property
     /// <summary> 座標データ </summary>
@@ -50,7 +51,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     #region Indexer
     public Point this[int index] => MapData[index];
     public Point this[int x, int y] => MapData[x + y * MAX_X];
-    public Point this[(int x, int y) pos] => MapData[pos.x + pos.y * MAX_X];
+    public Point this[Vector2Int pos] => MapData[pos.x + pos.y * MAX_X];
     #endregion
     #region Class
     /// <summary>
@@ -76,7 +77,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         /// <summary> 探索用合計コスト</summary>
         public int TotalCost;
         /// <summary> 探索用親座標 </summary>
-        public (int x, int y) Parent;
+        public Vector2Int Parent;
         /// <summary> 探索用状態 </summary>
         public SearchStateType State;
         /// <summary> 高度 </summary>
@@ -84,7 +85,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         #endregion
         #region Property
         /// <summary> 座標 </summary>
-        public (int x, int y) Pos { get => (X, Y); }
+        public Vector2Int Pos { get; }
         /// <summary> 移動計算時に掛かるコスト </summary>
         public int MoveCost { get => CurrentMoveCost + _moveCost; }
         #endregion
@@ -92,6 +93,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         {
             X = x;
             Y = y;
+            Pos = new Vector2Int(X, Y);
             _moveCost = cost;
         }
     }
@@ -131,7 +133,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         MapData = new Point[maxX * maxY];
         _route = new Stack<Point>();
         CreateMap(costData, levels);
-        FootprintsPoints = new List<(int,int)>();
+        FootprintsPoints = new List<Vector2Int>();
     }
     #endregion
     #endregion
@@ -193,7 +195,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     /// </summary>
     /// <param name="point"></param>
     /// <param name="movePower"></param>
-    private void MakeFootprintsPoint(Point point, int movePower,(int,int) parent)
+    private void MakeFootprintsPoint(Point point, int movePower, Vector2Int parent)
     {
         //指定地点への移動コストを引いた移動力がその座標の足跡より高い時のみ足跡を付ける
         if (movePower - point.MoveCost <= point.Footprints) { return; }
@@ -212,7 +214,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     /// </summary>
     /// <param name="start"></param>
     /// <returns></returns>
-    private bool CheckNeighor((int x, int y) start)
+    private bool CheckNeighor(Vector2Int start)
     {
         foreach (var neigher in GetNeighorMap(this[start]))
         {
@@ -262,9 +264,9 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     /// StateがOpenのCost最小の座標を返す
     /// </summary>
     /// <returns></returns>
-    private (int, int) GetMinimumCostOpenPoint()
+    private Vector2Int GetMinimumCostOpenPoint()
     {
-        (int, int) pos = NG_POINT;
+        Vector2Int pos = NG_POINT;
         int score = 0;
         int cost = CANNOT_MOVE_COST;
         foreach (var point in MapData)
@@ -314,7 +316,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     /// </summary>
     /// <param name="startPoint">開始地点</param>
     /// <param name="movePower">開始時の行動力</param>
-    public void MakeFootprints((int x, int y) startPoint, int movePower)
+    public void MakeFootprints(Vector2Int startPoint, int movePower)
     {
         //足跡の初期化
         foreach (var point in MapData)
@@ -333,7 +335,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     /// <param name="start">開始地点</param>
     /// <param name="goal">目標地点</param>
     /// <returns>到達可能ならtrue</returns>
-    public bool SearchShortestPath((int x, int y) start, (int x, int y) goal, int movePower)
+    public bool SearchShortestPath(Vector2Int start, Vector2Int goal, int movePower)
     {
         //探索データの初期化
         foreach (var point in MapData)
@@ -389,7 +391,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     /// </summary>
     /// <param name="targetPoint"></param>
     /// <returns></returns>
-    public IEnumerable<(int x, int y)> GetRoutePoints((int x, int y) targetPoint)
+    public IEnumerable<Vector2Int> GetRoutePoints(Vector2Int targetPoint)
     {
         while (true)
         {
