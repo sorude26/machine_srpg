@@ -14,19 +14,19 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
-  m_Fog: 0
-  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_Fog: 1
+  m_FogColor: {r: 0.66415095, g: 0.84290403, b: 1, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.01
+  m_FogDensity: 0.005
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
-  m_AmbientIntensity: 1
+  m_AmbientIntensity: 0
   m_AmbientMode: 0
-  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SubtractiveShadowColor: {r: 0, g: 0, b: 0, a: 1}
+  m_SkyboxMaterial: {fileID: 2100000, guid: c6174a3174fe93a4b8d4936f7b87cd02, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.42736486, g: 0.5806894, b: 0.71574485, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -547,6 +547,7 @@ GameObject:
   - component: {fileID: 963194228}
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
+  - component: {fileID: 963194229}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -619,6 +620,30 @@ Transform:
   m_Father: {fileID: 648581914}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 40, y: 45, z: 0}
+--- !u!205 &963194229
+LODGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  serializedVersion: 2
+  m_LocalReferencePoint: {x: 0, y: 0, z: 0}
+  m_Size: 1
+  m_FadeMode: 0
+  m_AnimateCrossFading: 0
+  m_LastLODIsBillboard: 0
+  m_LODs:
+  - screenRelativeHeight: 0.6
+    fadeTransitionWidth: 0
+    renderers: []
+  - screenRelativeHeight: 0.3
+    fadeTransitionWidth: 0
+    renderers: []
+  - screenRelativeHeight: 0.1
+    fadeTransitionWidth: 0
+    renderers: []
+  m_Enabled: 0
 --- !u!1 &1451776543
 GameObject:
   m_ObjectHideFlags: 0
@@ -651,7 +676,11 @@ MonoBehaviour:
   _base: {fileID: 566858719}
   _stageBase: {fileID: 1626202914}
   _pointPrefab: {fileID: 7999936987732332992, guid: 5b9b7b174097a9545a728e6621710b7b, type: 3}
-  _stagePrefab: {fileID: 6540409676531327231, guid: c394197b3c805ce44aec08e095c2d927, type: 3}
+  _stagePrefab:
+  - {fileID: 7561442600222951717, guid: c394197b3c805ce44aec08e095c2d927, type: 3}
+  - {fileID: 8417891090413389371, guid: ca31999ca996d744e92f67362a3672e2, type: 3}
+  - {fileID: 1337742526691637695, guid: d025d0405787d334cb486c33c53d82f5, type: 3}
+  - {fileID: 5674555862273159645, guid: e5303ee91319e6a488aca77107523f78, type: 3}
   _stageScale: 8
   _maxSize: 50
   _scale: 0.2
@@ -833,7 +862,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4678503b70604e145abdaa52e0915ce1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mapSprite: {fileID: 21300000, guid: c320253855732c74ebb2777446f17c9a, type: 3}
+  _mapSprite: {fileID: 21300000, guid: cf0c9f841d794d74e8c03276a9d0baac, type: 3}
+  _costSprite: {fileID: 21300000, guid: cc91c04ba4727b640b85ce75297f0902, type: 3}
   _stageCreater: {fileID: 1451776544}
 --- !u!4 &1787148787
 Transform:
