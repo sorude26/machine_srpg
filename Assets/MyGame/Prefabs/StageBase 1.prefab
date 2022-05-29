@@ -91,6 +91,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8535107986207698866}
   - component: {fileID: 1337742526691637695}
+  - component: {fileID: 537368555604284565}
+  - component: {fileID: 1011012006874497271}
   m_Layer: 0
   m_Name: StageBase 1
   m_TagString: Untagged
@@ -126,3 +128,54 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _terrainMaterial: {fileID: 2100000, guid: 241a8e68589634d4481f4533dbce1d08, type: 2}
+  _terrainFilter: {fileID: 537368555604284565}
+  _terrainRenderer: {fileID: 1011012006874497271}
+--- !u!33 &537368555604284565
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8535107986207698862}
+  m_Mesh: {fileID: 0}
+--- !u!23 &1011012006874497271
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8535107986207698862}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
