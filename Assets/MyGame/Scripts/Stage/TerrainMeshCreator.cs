@@ -4,90 +4,103 @@ using UnityEngine;
 
 public class TerrainMeshCreator : MonoBehaviour
 {
+    private enum Angle
+    {
+        Forward,
+        Back,
+        Left,
+        Right
+    }
     [SerializeField]
     private Material _terrainMaterial = default;
+    [SerializeField]
+    private MeshFilter _terrainFilter = default;
+    [SerializeField]
+    private MeshRenderer _terrainRenderer = default;
 
-    private float height = 1;
-    private float top = 0;
-    private int count = 0;
-    private Vector3[] GetVertices(float size, int a)
+    private float _height = 1f;
+    private float _topPos = 0f;
+    private int _verTicesCount = 0;
+    private Vector3[] GetVertices(float size, Angle angle)
     {
-        if (a == 1)
+        if (angle == Angle.Forward)
         {
             Vector3[] vertices = new Vector3[4]
             {
-                new Vector3(size, top, -size),
-                new Vector3(size, top - height, -size),
-                new Vector3(-size, top, -size),
-                new Vector3(-size, top - height, -size)
+                new Vector3(-size, _topPos - _height, size),
+                new Vector3(size, _topPos - _height, size),
+                new Vector3(-size, _topPos, size),
+                new Vector3(size, _topPos, size)
             };
             return vertices;
         }
-        else if (a == 2)
+        else if (angle == Angle.Back)
         {
             Vector3[] vertices = new Vector3[4]
             {
-                new Vector3(-size, top, size),
-                new Vector3(-size, top, -size),
-                new Vector3(-size, top - height, size),
-                new Vector3(-size, top - height, -size)
+                new Vector3(size, _topPos, -size),
+                new Vector3(size, _topPos - _height, -size),
+                new Vector3(-size, _topPos, -size),
+                new Vector3(-size, _topPos - _height, -size)
             };
             return vertices;
         }
-        else if (a == 3)
+        else if (angle == Angle.Left)
         {
             Vector3[] vertices = new Vector3[4]
             {
-                new Vector3(size, top, size),
-                new Vector3(size, top - height, size),
-                new Vector3(size, top, -size),
-                new Vector3(size, top - height, -size)
+                new Vector3(-size, _topPos, size),
+                new Vector3(-size, _topPos, -size),
+                new Vector3(-size, _topPos - _height, size),
+                new Vector3(-size, _topPos - _height, -size)
             };
             return vertices;
         }
-        else
+        else if (angle == Angle.Right)
         {
             Vector3[] vertices = new Vector3[4]
             {
-                new Vector3(-size, top - height, size),
-                new Vector3(size, top - height, size),
-                new Vector3(-size, top, size),
-                new Vector3(size, top, size)
+                new Vector3(size, _topPos, size),
+                new Vector3(size, _topPos - _height, size),
+                new Vector3(size, _topPos, -size),
+                new Vector3(size, _topPos - _height, -size)
             };
             return vertices;
         }
+        return null;
     }
     private int[] GetTris()
     {
         int[] tris = new int[6]
         {
-            1 + count, 2 + count, 0 + count,
-            1 + count, 3 + count, 2 + count
+            1 + _verTicesCount, 2 + _verTicesCount, 0 + _verTicesCount,
+            1 + _verTicesCount, 3 + _verTicesCount, 2 + _verTicesCount
         };
         return tris;
     }
-    private Vector3[] GetNormals(int a)
+    private Vector3[] GetNormals(Angle angle)
     {
-        if (a == 1)
-        {
-            Vector3[] normals = new Vector3[4] { Vector3.back, Vector3.back, Vector3.back, Vector3.back, };
-            return normals;
-        }
-        else if (a == 2)
-        {
-            Vector3[] normals = new Vector3[4] { Vector3.left, Vector3.left, Vector3.left, Vector3.left };
-            return normals;
-        }
-        else if (a == 3)
-        {
-            Vector3[] normals = new Vector3[4] { Vector3.right, Vector3.right, Vector3.right, Vector3.right };
-            return normals;
-        }
-        else
+        if (angle == Angle.Forward)
         {
             Vector3[] normalsa = new Vector3[4] { Vector3.forward, Vector3.forward, Vector3.forward, Vector3.forward };
             return normalsa;
         }
+        else if (angle == Angle.Back)
+        {
+            Vector3[] normals = new Vector3[4] { Vector3.back, Vector3.back, Vector3.back, Vector3.back, };
+            return normals;
+        }
+        else if (angle == Angle.Left)
+        {
+            Vector3[] normals = new Vector3[4] { Vector3.left, Vector3.left, Vector3.left, Vector3.left };
+            return normals;
+        }
+        else if (angle == Angle.Right)
+        {
+            Vector3[] normals = new Vector3[4] { Vector3.right, Vector3.right, Vector3.right, Vector3.right };
+            return normals;
+        }
+        return null;
     }
     private Vector2[] GetUv()
     {
@@ -100,43 +113,29 @@ public class TerrainMeshCreator : MonoBehaviour
         };
         return uv;
     }
-    private void CreatePanel(float size, int angle)
+    private void SetMeshData(Angle angle,float size,List<Vector3> verticesList,List<int> trianglesList,List<Vector3> normalList, List<Vector2> uvList)
     {
-        var obj = new GameObject($"(Comb:{angle})");
-        obj.transform.SetParent(transform);
-        obj.transform.localPosition = Vector3.zero;
-        var combRenderer = obj.AddComponent<MeshRenderer>();
-        combRenderer.material = _terrainMaterial;
-        var meshFilters = obj.AddComponent<MeshFilter>();
-        meshFilters.mesh = new Mesh();
-        meshFilters.mesh.vertices = GetVertices(size / 2, angle);
-        meshFilters.mesh.triangles = GetTris();
-        meshFilters.mesh.normals = GetNormals(angle);
-        meshFilters.mesh.uv = GetUv();
-    }
-    private void SetMeshData(int angle,float size,List<Vector3> verticesList,List<int> trianglesList,List<Vector3> normalList, List<Vector2> uvList)
-    {
-        foreach (var item in GetVertices(size / 2, angle))
+        foreach (var vertices in GetVertices(size / 2, angle))
         {
-            verticesList.Add(item);
+            verticesList.Add(vertices);
         }
-        foreach (var item in GetTris())
+        foreach (var triangele in GetTris())
         {
-            trianglesList.Add(item);
+            trianglesList.Add(triangele);
         }
-        foreach (var item in GetNormals(angle))
+        foreach (var normal in GetNormals(angle))
         {
-            normalList.Add(item);
+            normalList.Add(normal);
         }
-        foreach (var item in GetUv())
+        foreach (var uv in GetUv())
         {
-            uvList.Add(item);
+            uvList.Add(uv);
         }
     }
     public void CreateTerrain(float forwrd, float back, float left, float right, float size)
     {
-        height = size;
-        count = 0;
+        _height = size;
+        _verTicesCount = 0;
         float[] angles = new float[4] { forwrd, back, left, right };
         List<Vector3> verticesList = new List<Vector3>();
         List<int> trianglesList = new List<int>();
@@ -144,25 +143,29 @@ public class TerrainMeshCreator : MonoBehaviour
         List<Vector2> uvList = new List<Vector2>();
         for (int i = 0; i < angles.Length; i++)
         {
-            top = 0;
-            while (angles[i] > 0)
+            _topPos = 0;
+            while (angles[i] >= 0)// 各4方向の高低差数値が0になるまで壁のmesh情報を追加する
             {
-                SetMeshData(i, size, verticesList, trianglesList, normalList, uvList);
+                SetMeshData((Angle)i, size, verticesList, trianglesList, normalList, uvList);
                 angles[i] -= size;
-                top -= size;
-                count += 4;
+                _topPos -= size;
+                _verTicesCount += angles.Length;
             }
         }
-        var obj = new GameObject($"(Comb:{size})");
-        obj.transform.SetParent(transform);
-        obj.transform.localPosition = Vector3.zero;
-        var combRenderer = obj.AddComponent<MeshRenderer>();
-        combRenderer.material = _terrainMaterial;
-        var meshFilters = obj.AddComponent<MeshFilter>();
-        meshFilters.mesh = new Mesh();
-        meshFilters.mesh.vertices = verticesList.ToArray();
-        meshFilters.mesh.triangles = trianglesList.ToArray();
-        meshFilters.mesh.normals = normalList.ToArray();
-        meshFilters.mesh.uv = uvList.ToArray();
+        //リストに追加された頂点情報を元に地形Panelのメッシュを設定する
+        if (_terrainRenderer == null)
+        {
+            _terrainRenderer = transform.gameObject.AddComponent<MeshRenderer>();
+        }
+        if (_terrainFilter == null)
+        {
+            _terrainFilter = transform.gameObject.AddComponent<MeshFilter>();
+        }
+        _terrainRenderer.material = _terrainMaterial;
+        _terrainFilter.mesh = new Mesh();
+        _terrainFilter.mesh.vertices = verticesList.ToArray();
+        _terrainFilter.mesh.triangles = trianglesList.ToArray();
+        _terrainFilter.mesh.normals = normalList.ToArray();
+        _terrainFilter.mesh.uv = uvList.ToArray();
     }
 }
