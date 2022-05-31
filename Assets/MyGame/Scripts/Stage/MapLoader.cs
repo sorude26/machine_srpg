@@ -14,6 +14,10 @@ public class MapLoader : MonoBehaviour
     private int[] _levelMap = default;
     private int[] _costMap = default;
 
+    public int MapSizeX { get => _mapSizeX; }
+    public int MapSizeY { get => _mapSizeY; }
+    public int[] LevelMap { get => _levelMap; }
+    public int[] CostMap { get => _costMap; }
     [SerializeField]
     StageCreator _stageCreater = default;
     private void Start()
@@ -21,7 +25,7 @@ public class MapLoader : MonoBehaviour
         LoadMap();
         _stageCreater.CreateStage(_mapSizeX,_mapSizeY, _levelMap,_costMap);
     }
-    private void LoadMap()
+    public void LoadMap()
     {
         _mapSizeX = (int)_mapSprite.rect.width;
         _mapSizeY = (int)_mapSprite.rect.height;
