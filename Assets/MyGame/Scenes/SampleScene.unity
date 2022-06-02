@@ -681,7 +681,7 @@ MonoBehaviour:
   - {fileID: 8417891090413389371, guid: ca31999ca996d744e92f67362a3672e2, type: 3}
   - {fileID: 1337742526691637695, guid: d025d0405787d334cb486c33c53d82f5, type: 3}
   - {fileID: 5674555862273159645, guid: e5303ee91319e6a488aca77107523f78, type: 3}
-  _stageScale: 8
+  _stageScale: 10
   _maxSize: 50
   _scale: 0.2
   _testPlayer: {fileID: 6337282744388371078, guid: 83be74848da8d1140b8fde6308bced8e, type: 3}
@@ -862,8 +862,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4678503b70604e145abdaa52e0915ce1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mapSprite: {fileID: 21300000, guid: cf0c9f841d794d74e8c03276a9d0baac, type: 3}
-  _costSprite: {fileID: 21300000, guid: cc91c04ba4727b640b85ce75297f0902, type: 3}
+  _mapSprite: {fileID: 21300000, guid: e75373ab77e2bfe4aa386f05ea6b5745, type: 3}
+  _costSprite: {fileID: 21300000, guid: 6737ec15043fff24790e9d919a6dff37, type: 3}
   _stageCreater: {fileID: 1451776544}
 --- !u!4 &1787148787
 Transform:
