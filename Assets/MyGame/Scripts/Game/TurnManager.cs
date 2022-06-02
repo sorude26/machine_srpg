@@ -13,6 +13,10 @@ public class TurnManager : MonoBehaviour
     {
         return true;
     }
+    private void SortPieces()
+    {
+
+    }
     public IEnumerator Battle()
     {
         PieceController turnPiece = default;
@@ -20,6 +24,7 @@ public class TurnManager : MonoBehaviour
         {
             yield return turnPiece.TurnActionSequence();
             _isButtleNow = CheckBattleEnd();
+            SortPieces();
         }
     }
 }
