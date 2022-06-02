@@ -22,8 +22,19 @@ public class StageManager : MonoBehaviour
     {
         Instance = this;
     }
-    public Vector3 GetStagePos((int x,int y) Pos)
+    private void CreateStage()
     {
-        return new Vector3(Pos.x * _stageScale, Levels[Pos.x + Pos.y * MaxSizeX] * _levelScale, Pos.y * _stageScale);
+        _mapLoader.LoadMap();
+        _stageCreator.CreateStage(_mapLoader.MapSizeX, _mapLoader.MapSizeY, _mapLoader.LevelMap, _mapLoader.CostMap);
     }
+    public Vector3 GetStagePos(Vector2Int pos)
+    {
+        return new Vector3(pos.x * _stageScale, Levels[pos.x + pos.y * MaxSizeX] * _levelScale, pos.y * _stageScale);
+    }
+}
+public enum BelongType
+{
+    Player1,
+    Player2,
+    Other,
 }
