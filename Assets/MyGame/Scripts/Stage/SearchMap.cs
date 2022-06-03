@@ -25,6 +25,8 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     private const int START_FOOTPRINTS = -1;
     /// <summary> 移動不可の座標のコスト </summary>
     public const int CANNOT_MOVE_COST = 9999;
+    #endregion
+    #region ReadonlyField
     /// <summary> 移動不可の座標 </summary>
     private readonly Vector2Int NG_POINT = new Vector2Int(-1, -1);
     /// <summary> 最大X座標 </summary>
@@ -96,6 +98,14 @@ public class SearchMap : IEnumerable<SearchMap.Point>
             Pos = new Vector2Int(X, Y);
             _moveCost = cost;
         }
+        public static explicit operator Point(Vector2Int pos)
+        {
+            return new Point(pos.x, pos.y);
+        }
+        public static explicit operator Vector2Int(Point pos)
+        {
+            return new Vector2Int(pos.X, pos.Y);
+        }        
     }
     #endregion
     #region Constructor
@@ -126,7 +136,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         _route = new Stack<Point>();
         CreateMap(costData);
     }
-    public SearchMap(int maxX,int maxY, int[] costData,int[] levels)
+    public SearchMap(int maxX, int maxY, int[] costData, int[] levels)
     {
         MAX_X = maxX;
         MAX_Y = maxY;
@@ -165,7 +175,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
             }
         }
     }
-    private void CreateMap(int[] costData,int[] levels)
+    private void CreateMap(int[] costData, int[] levels)
     {
         for (int y = 0; y < MAX_Y; y++)
         {
@@ -308,9 +318,19 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <returns></returns>
-    private int Difference(int x, int y) => x > y? x - y : y - x;
+    private int Difference(int x, int y) => x > y ? x - y : y - x;
     #endregion
     #region PublicMethod
+    /// <summary>
+    /// 二点のマスの距離を返す
+    /// </summary>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    /// <returns></returns>
+    public static int Distance(Vector2Int start, Vector2Int end)
+    {
+        return start.x > end.x ? start.x - end.x : end.x - start.x + start.y > end.y ? start.y - end.y : end.y - start.y;
+    }
     /// <summary>
     /// ダイクストラ法の範囲検索で足跡を付ける
     /// </summary>
@@ -414,7 +434,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
             yield return MapData[count];
             count++;
         }
-    }
+    }   
     #endregion
 }
 #endregion
