@@ -31,6 +31,22 @@ public class StageManager : MonoBehaviour
     {
         return new Vector3(pos.x * _stageScale, Levels[pos.x + pos.y * MaxSizeX] * _levelScale, pos.y * _stageScale);
     }
+    public void SetPiece(PieceController piece,Vector2Int pos)
+    {
+        var setPiece = Instantiate(piece);
+        setPiece.StartSet(StageMoveMap, pos);
+        _stageAllPieces.Add(setPiece);
+    }
+    public void SetCost(BelongType belong)
+    {
+        foreach (var piece in _stageAllPieces)
+        {
+            if (piece.PieceBelongType != belong)
+            {
+                StageMoveMap[piece.CurrentPos].CurrentMoveCost = SearchMap.CANNOT_MOVE_COST;
+            }
+        }
+    }
 }
 public enum BelongType
 {

@@ -59,14 +59,14 @@ public class MapLoader : MonoBehaviour
     {
         float r = color.r;
         float g = color.g;
-        float b = color.b;
-        if (r > g + b)
-        {
-            return 2;
-        }
-        else if (g > r + b)
+        float b = color.b; 
+        if (g > r + b)
         {
             return 3;
+        }
+        else if (r > g + b)
+        {
+            return 2;
         }
         else if(b > r + g)
         {

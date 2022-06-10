@@ -13,6 +13,9 @@ public class TurnManager : MonoBehaviour
     {
         return true;
     }
+    /// <summary>
+    /// ‹î‚Ì‡ˆÊ‚ğŒˆ’è‚·‚é
+    /// </summary>
     private void SortPieces()
     {
 
@@ -25,6 +28,11 @@ public class TurnManager : MonoBehaviour
             yield return turnPiece.TurnActionSequence();
             _isButtleNow = CheckBattleEnd();
             SortPieces();
+            turnPiece = null;//Ÿ‚É“®‚­‹î‚ğİ’è‚·‚é
+            if (turnPiece == null)
+            {
+                break;
+            }
         }
     }
 }

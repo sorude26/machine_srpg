@@ -65,7 +65,6 @@ public class StageCreator : MonoBehaviour
         _player.StartSet(this, start);
         _cameraTarget.position = _player.transform.position;
         _cameraTarget.SetParent(_player.transform);
-        //MeshControl.Combine(transform);
     }
     public void CreateStage(int sizeX,int sizeY, int[] levels,int[] costs)
     {

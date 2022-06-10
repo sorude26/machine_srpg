@@ -14,6 +14,7 @@ public class PieceController : MonoBehaviour
     private PieceMoveController _moveController = default;
     private StageCreator _stage = default;
     public Vector2Int CurrentPos { get; protected set; }
+    public BelongType PieceBelongType { get; protected set; }
     /// <summary>
     /// s“®Œˆ’èˆ—
     /// </summary>
