@@ -1,38 +1,40 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class TurnManager : MonoBehaviour
 {
-    public const float BASE_ACTIVITY = 1f;
-    public const float MOVE_ACTIVITY = 2f;
-    public const float ATTACK_ACTIVITY = 3f;
-
     private bool _isButtleNow = false;
-    private bool CheckBattleEnd()
+    public PieceController TurnPiece { get; private set; }
+    /// <summary>
+    /// 戦闘継続か確認する
+    /// </summary>
+    /// <returns></returns>
+    private bool CheckContinueBattle()
     {
         return true;
     }
     /// <summary>
-    /// 駒の順位を決定する
+    /// 次に行動する駒を返す
     /// </summary>
-    private void SortPieces()
+    /// <returns></returns>
+    private PieceController NextActivityPiece()
     {
-
+        //行動力更新
+        StageManager.Instance.UpdateAllActivty();
+        //行動力最高値の駒を返す
+        return StageManager.Instance.AllPieces.OrderBy(p => p.Activity).FirstOrDefault();
     }
     public IEnumerator Battle()
     {
-        PieceController turnPiece = default;
+        //最初に行動する駒を設定する
+        TurnPiece = NextActivityPiece();
         while (_isButtleNow)
         {
-            yield return turnPiece.TurnActionSequence();
-            _isButtleNow = CheckBattleEnd();
-            SortPieces();
-            turnPiece = null;//次に動く駒を設定する
-            if (turnPiece == null)
-            {
-                break;
-            }
+            yield return TurnPiece.TurnActionSequence();
+            TurnPiece = NextActivityPiece();
+            _isButtleNow = CheckContinueBattle();
         }
     }
 }
