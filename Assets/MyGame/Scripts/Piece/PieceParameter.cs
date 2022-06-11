@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class PieceParameter : MonoBehaviour
 {
-    public float Activity { get; private set; }
+    public int Activity { get; private set; }
 }
