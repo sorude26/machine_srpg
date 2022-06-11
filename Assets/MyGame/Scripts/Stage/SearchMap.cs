@@ -43,12 +43,12 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     #region PublicField
     /// <summary> 昇降能力 </summary>
     public int LiftingPower;
-
-    public List<Vector2Int> FootprintsPoints = default;
     #endregion
     #region Property
     /// <summary> 座標データ </summary>
     public Point[] MapData { get; }
+    /// <summary> 足跡付き座標リスト </summary>
+    public List<Vector2Int> FootprintsPoints { get; }
     #endregion
     #region Indexer
     public Point this[int index] => MapData[index];
@@ -65,7 +65,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         public readonly int Y;
         #region PrivateField
         /// <summary> 移動に掛かるコスト </summary>
-        private int _moveCost;
+        private readonly int _moveCost;
         #endregion
         #region PublicField
         /// <summary> 座標の状況に応じて変更可能なコスト </summary>
@@ -145,6 +145,15 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         CreateMap(costData, levels);
         FootprintsPoints = new List<Vector2Int>();
     }
+    public SearchMap(int[] levels,int maxX,int maxY)
+    {
+        MAX_X = maxX;
+        MAX_Y = maxY;
+        MapData = new Point[maxX * maxY];
+        _route = new Stack<Point>();
+        CreateLevelMap(levels);
+        FootprintsPoints = new List<Vector2Int>();
+    }
     #endregion
     #endregion
     #region PrivateMethod
@@ -182,6 +191,17 @@ public class SearchMap : IEnumerable<SearchMap.Point>
             for (int x = 0; x < MAX_X; x++)
             {
                 MapData[x + y * MAX_X] = new Point(x, y, costData[x + y * MAX_X]);
+                MapData[x + y * MAX_X].Level = levels[x + y * MAX_X];
+            }
+        }
+    }
+    private void CreateLevelMap(int[] levels)
+    {
+        for (int y = 0; y < MAX_Y; y++)
+        {
+            for (int x = 0; x < MAX_X; x++)
+            {
+                MapData[x + y * MAX_X] = new Point(x, y);
                 MapData[x + y * MAX_X].Level = levels[x + y * MAX_X];
             }
         }

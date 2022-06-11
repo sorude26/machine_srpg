@@ -42,15 +42,17 @@ public class PieceController : MonoBehaviour
         yield return null;
     }
     /// <summary>
-    /// 移動処理
+    /// 目標地点への移動処理シーケンス
     /// </summary>
     /// <param name="target"></param>
     /// <returns></returns>
     private IEnumerator MoveSequence(Vector2Int target)
     {
+        //現在地と目標が同じ場合は終了する
         if (CurrentPos == target) { yield break; }
         foreach (var point in _searchMap.GetRoutePoints(target))
         {
+            //移動ルートを設定する
             _moveController.MovePoints.Push(StageManager.Instance.GetStagePos(point));
         }
         yield return _moveController.Move();
@@ -89,32 +91,21 @@ public class PieceController : MonoBehaviour
     }
     #endregion
     /// <summary>
-    /// 初期化処理（仮）
-    /// </summary>
-    /// <param name="stage"></param>
-    /// <param name="startPos"></param>
-    public void StartSet(StageCreator stage, Vector2Int startPos)
-    {
-        _moveController = GetComponent<PieceMoveController>();
-        _searchMap = new SearchMap(stage.MaxSize, stage.MaxSize, stage.Costs, stage.Levels);
-        _searchMap.LiftingPower = _liftingPower;
-        CurrentPos = startPos;
-        _stage = stage; 
-        MeshControl.Combine(_base);
-        //_moveController.Warp(StageManager.Instance.GetStagePos(startPos));
-        _moveController.Warp(new Vector3(CurrentPos.x * _stage.StageScale, _stage.Levels[CurrentPos.x + CurrentPos.y * _stage.MaxSize] * _stage.Scale, CurrentPos.y  * _stage.StageScale));
-    }
-    /// <summary>
     /// 初期配置処理
     /// </summary>
     /// <param name="stageMap"></param>
     /// <param name="startPos"></param>
-    public void StartSet(SearchMap stageMap,Vector2Int startPos)
+    public void StartSet(SearchMap stageMap,Vector2Int startPos,BelongType belong)
     {
+        _moveController = GetComponent<PieceMoveController>();
         _searchMap = stageMap;
         CurrentPos = startPos;
         _moveController.Warp(StageManager.Instance.GetStagePos(startPos));
+        Belong = belong;
     }
+    /// <summary>
+    /// 行動力を更新する
+    /// </summary>
     public void UpdateActivity()
     {
         if (State == PieceStateType.Exit) { return; }
@@ -132,6 +123,7 @@ public class PieceController : MonoBehaviour
         {
             return;
         }
+        _searchMap.LiftingPower = _liftingPower;
         _searchMap.MakeFootprints(CurrentPos, _movePower);
         foreach (var point in _searchMap.FootprintsPoints)
         {
@@ -154,8 +146,7 @@ public class PieceController : MonoBehaviour
         }
         foreach (var point in _searchMap.GetRoutePoints(target))
         {
-            //_moveController.MovePoints.Push(StageManager.Instance.GetStagePos(point));
-            _moveController.MovePoints.Push(new Vector3(point.x * _stage.StageScale, _stage.Levels[point.x + point.y * _stage.MaxSize] * _stage.Scale, point.y * _stage.StageScale));
+            _moveController.MovePoints.Push(StageManager.Instance.GetStagePos(point));
         }
         StartCoroutine(_moveController.Move());
         CurrentPos = target;

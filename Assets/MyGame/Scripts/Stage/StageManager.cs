@@ -14,21 +14,36 @@ public class StageManager : MonoBehaviour
     private float _stageScale = 8f;
     private float _levelScale = 0.2f;
     public SearchMap StageMoveMap { get; private set; }
+    public SearchMap AttackMap { get; private set; }
     public List<PieceController> AllPieces { get => _stageAllPieces; }
     public int MaxSizeX { get; private set; }
     public int MaxSizeY { get; private set; }
     public int[] Levels { get; private set; }
     public int[] Costs { get; private set; }
+    public bool IsCreateStage { get; private set; }
     private void Awake()
     {
         Instance = this;
+    }
+    private void Start()
+    {
+        CreateStage();
     }
     private void CreateStage()
     {
         _mapLoader.LoadMap();
         _stageCreator.CreateStage(_mapLoader.MapSizeX, _mapLoader.MapSizeY, _mapLoader.LevelMap, _mapLoader.CostMap);
+        MaxSizeX = _stageCreator.MaxSize;
+        MaxSizeY = _stageCreator.MaxSize;
+        Levels = _stageCreator.Levels;
+        Costs = _stageCreator.Costs;
+        _stageScale = _stageCreator.StageScale;
+        _levelScale = _stageCreator.Scale;
+        StageMoveMap = new SearchMap(MaxSizeX, MaxSizeY, Costs, Levels);
+        AttackMap = new SearchMap(Levels, MaxSizeX, MaxSizeY);
         _stageAllPieces = new List<PieceController>();
         _costChangePos = new Stack<Vector2Int>();
+        IsCreateStage = true;
     }
     public Vector3 GetStagePos(Vector2Int pos)
     {
@@ -46,10 +61,13 @@ public class StageManager : MonoBehaviour
     /// </summary>
     /// <param name="piece"></param>
     /// <param name="pos"></param>
-    public void PlaceAnPiece(PieceController piece,Vector2Int pos)
+    public void PlaceAnPiece(PieceController piece,Vector2Int pos,BelongType belong)
     {
         var setPiece = Instantiate(piece);
-        setPiece.StartSet(StageMoveMap, pos);
+        setPiece.transform.position = Vector3.zero;
+        setPiece.transform.rotation = Quaternion.identity;
+        setPiece.transform.SetParent(transform);
+        setPiece.StartSet(StageMoveMap, pos, belong);
         _stageAllPieces.Add(setPiece);
     }
     /// <summary>

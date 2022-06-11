@@ -26,10 +26,7 @@ public class PieceMoveController : MonoBehaviour
     /// <returns></returns>
     private bool IsMoveingForTarget()
     {
-        if (Vector3.Distance(transform.position, _targetPos) < TARGET_DISTANCE)
-        {
-            return false;
-        }
+        if (Vector3.Distance(transform.position, _targetPos) < TARGET_DISTANCE) { return false; }
         transform.position = Vector3.MoveTowards(transform.position, _targetPos, _moveSpeed * Time.deltaTime);
         return true;
     }
@@ -39,13 +36,10 @@ public class PieceMoveController : MonoBehaviour
     /// </summary>
     private void LookTarget()
     {
-        if (Vector3.Distance(transform.position, _targetPos) < TARGET_DISTANCE)
-        {
-            return;
-        }
+        if (Vector3.Distance(transform.position, _targetPos) < TARGET_DISTANCE) { return; }
         var targetDir = _targetPos - transform.position;
         targetDir.y = 0;
-        transform.forward = targetDir.normalized;
+        transform.forward = targetDir;
     }
     /// <summary>
     /// ˆêƒ}ƒX•ª‚ÌˆÚ“®‚ð‘Ò‚Â

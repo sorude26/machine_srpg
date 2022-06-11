@@ -22,8 +22,8 @@ public class MapLoader : MonoBehaviour
     StageCreator _stageCreater = default;
     private void Start()
     {
-        LoadMap();
-        _stageCreater.CreateStage(_mapSizeX,_mapSizeY, _levelMap,_costMap);
+        //LoadMap();
+        //_stageCreater.CreateStage(_mapSizeX,_mapSizeY, _levelMap,_costMap);
     }
     public void LoadMap()
     {

@@ -41,7 +41,7 @@ public class StageCreator : MonoBehaviour
     private int StageSizeY;
     public void CreateStage()
     {
-        _player = Instantiate(_testPlayer);
+        //_player = Instantiate(_testPlayer);
         _costs = new int[_maxSize * _maxSize];
         _levels = new int[_maxSize * _maxSize];
         _stagePoints = new StagePoint[_maxSize * _maxSize];
@@ -56,15 +56,15 @@ public class StageCreator : MonoBehaviour
                 _stagePoints[x - StageSizeX + (y - StageSizeY) * _maxSize] = stage;
                 _costs[x - StageSizeX + (y - StageSizeY) * _maxSize] = 1 + _costsAll[x + y * _stageSizeX];
                 _levels[x - StageSizeX + (y - StageSizeY) * _maxSize] = _levelsAll[x + y * _stageSizeX];
-                stage.DelSelect += _player.StartMove;
+                //stage.DelSelect += _player.StartMove;
             }
         }
         Vector2Int start = new Vector2Int();
         start.x = _playerPosition.x;
         start.y = _playerPosition.y;
-        _player.StartSet(this, start);
-        _cameraTarget.position = _player.transform.position;
-        _cameraTarget.SetParent(_player.transform);
+        //_player.StartSet(this, start);
+        //_cameraTarget.position = _player.transform.position;
+        //_cameraTarget.SetParent(_player.transform);
     }
     public void CreateStage(int sizeX,int sizeY, int[] levels,int[] costs)
     {
@@ -113,6 +113,6 @@ public class StageCreator : MonoBehaviour
     }
     public void Search()
     {
-        _player.Search();
+        //_player.Search();
     }
 }
