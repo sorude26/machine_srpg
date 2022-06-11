@@ -9,11 +9,12 @@ public class StageManager : MonoBehaviour
     private StageCreator _stageCreator = default;
     [SerializeField]
     private MapLoader _mapLoader = default;
-
     private List<PieceController> _stageAllPieces = default;
+    private Stack<Vector2Int> _costChangePos = default;
     private float _stageScale = 8f;
     private float _levelScale = 0.2f;
     public SearchMap StageMoveMap { get; private set; }
+    public List<PieceController> AllPieces { get => _stageAllPieces; }
     public int MaxSizeX { get; private set; }
     public int MaxSizeY { get; private set; }
     public int[] Levels { get; private set; }
@@ -26,25 +27,58 @@ public class StageManager : MonoBehaviour
     {
         _mapLoader.LoadMap();
         _stageCreator.CreateStage(_mapLoader.MapSizeX, _mapLoader.MapSizeY, _mapLoader.LevelMap, _mapLoader.CostMap);
+        _stageAllPieces = new List<PieceController>();
+        _costChangePos = new Stack<Vector2Int>();
     }
     public Vector3 GetStagePos(Vector2Int pos)
     {
         return new Vector3(pos.x * _stageScale, Levels[pos.x + pos.y * MaxSizeX] * _levelScale, pos.y * _stageScale);
     }
-    public void SetPiece(PieceController piece,Vector2Int pos)
+    public void UpdateAllActivty()
+    {
+        foreach (var piece in _stageAllPieces)
+        {
+            piece.UpdateActivity();
+        }
+    }
+    /// <summary>
+    /// 駒の配置処理
+    /// </summary>
+    /// <param name="piece"></param>
+    /// <param name="pos"></param>
+    public void PlaceAnPiece(PieceController piece,Vector2Int pos)
     {
         var setPiece = Instantiate(piece);
         setPiece.StartSet(StageMoveMap, pos);
         _stageAllPieces.Add(setPiece);
     }
+    /// <summary>
+    /// 障害物のコストを配置する
+    /// </summary>
+    /// <param name="pos"></param>
+    public void PlaceAnObstacle(Vector2Int pos)
+    {
+        StageMoveMap[pos].CurrentMoveCost = SearchMap.CANNOT_MOVE_COST;
+    }
+    /// <summary>
+    /// 移動前のコスト設定処理
+    /// </summary>
+    /// <param name="belong">所属勢力</param>
     public void SetCost(BelongType belong)
     {
+        while (_costChangePos.Count > 0)
+        {
+            //変更箇所のコストをリセットする
+            StageMoveMap[_costChangePos.Pop()].CurrentMoveCost = 0;
+        }
         foreach (var piece in _stageAllPieces)
         {
-            if (piece.PieceBelongType != belong)
-            {
-                StageMoveMap[piece.CurrentPos].CurrentMoveCost = SearchMap.CANNOT_MOVE_COST;
-            }
+            //退場中及び同所属は処理しない
+            if (piece.State == PieceStateType.Exit || piece.Belong == belong) { continue; }
+            //駒のいる場所に移動不可のコストを設定する
+            StageMoveMap[piece.CurrentPos].CurrentMoveCost = SearchMap.CANNOT_MOVE_COST;
+            //変更箇所を保存
+            _costChangePos.Push(piece.CurrentPos);
         }
     }
 }
