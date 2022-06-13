@@ -22,11 +22,16 @@ public class PieceController : MonoBehaviour
     private int _movePower = 5;
     [SerializeField]
     private int _liftingPower = 5;
+    [SerializeField]
+    private int _activity = 6;
+    [SerializeField]
+    private PieceBrain _brain = default;
     public Transform _base = default;
     private SearchMap _searchMap = default;
     private PieceMoveController _moveController = default;
     private StageCreator _stage = default;
     private PieceParameter _parameter = default;
+    private Vector2Int _targetPos = default;
     public Vector2Int CurrentPos { get; protected set; }
     public BelongType Belong { get; protected set; }
     public PieceStateType State { get;protected set; }
@@ -38,25 +43,27 @@ public class PieceController : MonoBehaviour
     /// <returns></returns>
     private IEnumerator SearchSequence()
     {
+        StageManager.Instance.SetCost(Belong);
+        _searchMap.LiftingPower = _liftingPower;
         _searchMap.MakeFootprints(CurrentPos, _movePower);
         yield return null;
+        _targetPos = _brain.GetMoveTarget(_searchMap);
     }
     /// <summary>
     /// 目標地点への移動処理シーケンス
     /// </summary>
-    /// <param name="target"></param>
     /// <returns></returns>
-    private IEnumerator MoveSequence(Vector2Int target)
+    private IEnumerator MoveSequence()
     {
         //現在地と目標が同じ場合は終了する
-        if (CurrentPos == target) { yield break; }
-        foreach (var point in _searchMap.GetRoutePoints(target))
+        if (CurrentPos == _targetPos) { yield break; }
+        foreach (var point in _searchMap.GetRoutePoints(_targetPos))
         {
             //移動ルートを設定する
             _moveController.MovePoints.Push(StageManager.Instance.GetStagePos(point));
         }
         yield return _moveController.Move();
-        CurrentPos = target;
+        CurrentPos = _targetPos;
         Activity -= MOVE_ACTIVITY_COST;
     }
     /// <summary>
@@ -84,8 +91,7 @@ public class PieceController : MonoBehaviour
     public IEnumerator TurnActionSequence()
     {
         yield return SearchSequence();
-        Vector2Int target = CurrentPos;
-        yield return MoveSequence(target);
+        yield return MoveSequence();
         yield return BattleSequence();
         yield return TurnEndSequenc();
     }
@@ -109,7 +115,7 @@ public class PieceController : MonoBehaviour
     public void UpdateActivity()
     {
         if (State == PieceStateType.Exit) { return; }
-        Activity += _parameter.Activity;
+        Activity += _activity;
     }
     public void DeadPiece()
     {
