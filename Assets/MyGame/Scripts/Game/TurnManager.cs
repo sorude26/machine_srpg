@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class TurnManager : MonoBehaviour
 {
+    [SerializeField]
+    private Transform _cameraBase = null;
     private bool _isButtleNow = false;
     public PieceController TurnPiece { get; private set; }
     public void StartBattle()
@@ -33,7 +35,7 @@ public class TurnManager : MonoBehaviour
         //行動力更新
         StageManager.Instance.UpdateAllActivty();
         //行動力最高値の駒を返す
-        return StageManager.Instance.AllPieces.OrderBy(p => p.Activity).FirstOrDefault();
+        return StageManager.Instance.AllPieces.OrderByDescending(p => p.Activity).FirstOrDefault();
     }
     /// <summary>
     /// 戦闘処理
@@ -47,6 +49,8 @@ public class TurnManager : MonoBehaviour
         {
             yield return TurnPiece.TurnActionSequence();
             TurnPiece = NextActivityPiece();
+            _cameraBase.transform.SetParent(TurnPiece.transform);
+            _cameraBase.transform.localPosition = Vector3.zero;
             _isButtleNow = CheckContinueBattle();
         }
     }
