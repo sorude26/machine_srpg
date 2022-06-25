@@ -10,7 +10,7 @@ public class StageManager : MonoBehaviour
     [SerializeField]
     private MapLoader _mapLoader = default;
     private List<PieceController> _stageAllPieces = default;
-    private Stack<Vector2Int> _costChangePos = default;
+    private Stack<MapPoint> _costChangePos = default;
     private float _stageScale = 8f;
     private float _levelScale = 0.2f;
     public SearchMap StageMoveMap { get; private set; }
@@ -42,12 +42,12 @@ public class StageManager : MonoBehaviour
         StageMoveMap = new SearchMap(MaxSizeX, MaxSizeY, Costs, Levels);
         AttackMap = new SearchMap(Levels, MaxSizeX, MaxSizeY);
         _stageAllPieces = new List<PieceController>();
-        _costChangePos = new Stack<Vector2Int>();
+        _costChangePos = new Stack<MapPoint>();
         IsCreateStage = true;
     }
-    public Vector3 GetStagePos(Vector2Int pos)
+    public Vector3 GetStagePos(MapPoint pos)
     {
-        return new Vector3(pos.x * _stageScale, Levels[pos.x + pos.y * MaxSizeX] * _levelScale, pos.y * _stageScale);
+        return new Vector3(pos.X * _stageScale, Levels[pos.X + pos.Y * MaxSizeX] * _levelScale, pos.Y * _stageScale);
     }
     public void UpdateAllActivty()
     {
@@ -61,7 +61,7 @@ public class StageManager : MonoBehaviour
     /// </summary>
     /// <param name="piece"></param>
     /// <param name="pos"></param>
-    public void PlaceAnPiece(PieceController piece,Vector2Int pos,BelongType belong)
+    public void PlaceAnPiece(PieceController piece,MapPoint pos,BelongType belong)
     {
         var setPiece = Instantiate(piece);
         setPiece.transform.position = Vector3.zero;
@@ -74,7 +74,7 @@ public class StageManager : MonoBehaviour
     /// 障害物のコストを配置する
     /// </summary>
     /// <param name="pos"></param>
-    public void PlaceAnObstacle(Vector2Int pos)
+    public void PlaceAnObstacle(MapPoint pos)
     {
         StageMoveMap[pos].CurrentMoveCost = SearchMap.CANNOT_MOVE_COST;
     }

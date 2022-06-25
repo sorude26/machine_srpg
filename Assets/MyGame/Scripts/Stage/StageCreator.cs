@@ -107,9 +107,9 @@ public class StageCreator : MonoBehaviour
         _base.gameObject.SetActive(false);
         CreateStage();
     }
-    public StagePoint GetPoint(Vector2Int pos)
+    public StagePoint GetPoint(MapPoint pos)
     {
-        return _stagePoints[pos.x + pos.y * _maxSize];
+        return _stagePoints[pos.X + pos.Y * _maxSize];
     }
     public void Search()
     {

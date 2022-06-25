@@ -21,7 +21,7 @@ public class PieceArrangementController : MonoBehaviour
         {
             return;
         }
-        StageManager.Instance.PlaceAnPiece(_testPiece, _startPosition, _belong);
+        StageManager.Instance.PlaceAnPiece(_testPiece, (MapPoint)_startPosition, _belong);
         _deployPositions.Add(_startPosition);
     }
 }

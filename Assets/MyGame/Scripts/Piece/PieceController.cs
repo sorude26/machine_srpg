@@ -31,8 +31,8 @@ public class PieceController : MonoBehaviour
     private PieceMoveController _moveController = default;
     private StageCreator _stage = default;
     private PieceParameter _parameter = default;
-    private Vector2Int _targetPos = default;
-    public Vector2Int CurrentPos { get; protected set; }
+    private MapPoint _targetPos = default;
+    public MapPoint CurrentPos { get; protected set; }
     public BelongType Belong { get; protected set; }
     public PieceStateType State { get;protected set; }
     public int Activity { get; protected set; }
@@ -101,7 +101,7 @@ public class PieceController : MonoBehaviour
     /// </summary>
     /// <param name="stageMap"></param>
     /// <param name="startPos"></param>
-    public void StartSet(SearchMap stageMap,Vector2Int startPos,BelongType belong)
+    public void StartSet(SearchMap stageMap,MapPoint startPos,BelongType belong)
     {
         _moveController = GetComponent<PieceMoveController>();
         _searchMap = stageMap;
@@ -140,7 +140,7 @@ public class PieceController : MonoBehaviour
     /// 指定地点へ移動開始する
     /// </summary>
     /// <param name="target"></param>
-    public void StartMove(Vector2Int target) 
+    public void StartMove(MapPoint target) 
     {
         if (_moveController.IsMoveing)
         {

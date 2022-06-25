@@ -4,5 +4,5 @@ using UnityEngine;
 
 public abstract class PieceBrain : ScriptableObject
 {
-    public abstract Vector2Int GetMoveTarget(SearchMap searchMap);
+    public abstract MapPoint GetMoveTarget(SearchMap searchMap);
 }

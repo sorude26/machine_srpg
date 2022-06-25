@@ -89,7 +89,7 @@ public class PieceMoveController : MonoBehaviour
         }
         else if (Mathf.Abs(_currentLevel - _targetPos.y) <= _jumpLiftingLevel)
         {
-            var a = new Calculation.Parabola(transform.position, new Vector2(p.x, _targetPos.y + 1f), (Vector2)_targetPos);
+            var a = new Calculation.Parabola(transform.position, new Vector2(p.x, _targetPos.y + 1f), _targetPos);
         }
     }
     
