@@ -1,74 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-/// <summary>
-/// マップ座標
-/// </summary>
-public struct MapPoint
-{
-    public int X;
-    public int Y;
-    public int Level;
-    public MapPoint(int x,int y,int level = 0)
-    {
-        this.X = x;
-        this.Y = y;
-        this.Level = level;
-    }
-    #region OperatorOverride
-    public static int operator +(MapPoint startPos,MapPoint pos)
-    {
-        return Distance(startPos, pos);
-    }
-    public static int operator -(MapPoint startPos, MapPoint pos)
-    {
-        return Distance(startPos, pos);
-    }
-    public static bool operator ==(MapPoint posA,MapPoint posB)
-    {
-        return posA.X == posB.X && posA.Y == posB.Y;
-    }
-    public static bool operator !=(MapPoint posA, MapPoint posB)
-    {
-        return posA.X != posB.X || posA.Y != posB.Y;
-    }
-    public override bool Equals(object obj)
-    {
-        if (obj is MapPoint point)
-        {
-            return Equals(point);
-        }
-        return false;
-    }   
-    public override int GetHashCode()
-    {
-        return this.X ^ this.Y;
-    }
-    #endregion
-    #region StaticMethod
-    /// <summary>
-    /// 座標間の距離を返す
-    /// </summary>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
-    /// <returns></returns>
-    public static int Distance(MapPoint start, MapPoint end)
-    {
-        return start.X > end.X ? start.X - end.X : end.X - start.X + start.Y > end.Y ? start.Y - end.Y : end.Y - start.Y;
-    }
-    #endregion
-    #region PublicMethod
-    /// <summary>
-    /// この座標と等しい場合はtrue
-    /// </summary>
-    /// <param name="pos"></param>
-    /// <returns></returns>
-    public bool Equals(MapPoint pos)
-    {
-        return this.X == pos.X && this.Y == pos.Y;
-    }
-    #endregion
-}
 
 /// <summary>
 /// 探索マップ
@@ -94,8 +26,6 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     public const int CANNOT_MOVE_COST = 9999;
     #endregion
     #region ReadonlyField
-    /// <summary> 移動不可の座標 </summary>
-    private readonly MapPoint NG_POINT = new MapPoint(-1, -1);
     /// <summary> 最大X座標 </summary>
     public readonly int MAX_X;
     /// <summary> 最大Y座標 </summary>
@@ -120,7 +50,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     #region Indexer
     public Point this[int index] => MapData[index];
     public Point this[int x, int y] => MapData[x + y * MAX_X];
-    public Point this[MapPoint pos] => MapData[pos.X + pos.Y * MAX_X];
+    public Point this[MapPoint pos] => MapData[pos.Index(MAX_X)];
     #endregion
     #region Class
     /// <summary>
@@ -155,6 +85,10 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         #region Property
         /// <summary> 座標 </summary>
         public MapPoint Pos { get; }
+        public MapPoint Up { get => new MapPoint(X, Y - 1); }
+        public MapPoint Down { get => new MapPoint(X, Y + 1); }
+        public MapPoint Left { get => new MapPoint(X - 1, Y); }
+        public MapPoint Right { get => new MapPoint(X + 1, Y); }
         /// <summary> 移動計算時に掛かるコスト </summary>
         public int MoveCost { get => CurrentMoveCost + _moveCost; }
         #endregion
@@ -320,7 +254,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         }
         //次の確認座標がなければ終了
         var next = GetMinimumCostOpenPoint();
-        if (next == NG_POINT) { return false; }
+        if (next == MapPoint.NG_POINT) { return false; }
         //次の座標に移る前に閉じる
         this[start].State = SearchStateType.Close;
         return CheckNeighor(next);
@@ -363,7 +297,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     /// <returns></returns>
     private MapPoint GetMinimumCostOpenPoint()
     {
-        MapPoint pos = NG_POINT;
+        MapPoint pos = MapPoint.NG_POINT;
         int score = 0;
         int cost = CANNOT_MOVE_COST;
         foreach (var point in MapData)
@@ -396,7 +330,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         //道のりを保存
         _route.Push(point);
         //開始地点であれば終了
-        if (point.Parent == NG_POINT) { return true; }
+        if (point.Parent == MapPoint.NG_POINT) { return true; }
         return SaveRoutePoint(this[point.Parent]);
     }
     /// <summary>
@@ -409,16 +343,6 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     #endregion
     #region PublicMethod
     /// <summary>
-    /// 二点のマスの距離を返す
-    /// </summary>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
-    /// <returns></returns>
-    public static int Distance(MapPoint start, MapPoint end)
-    {
-        return start.X > end.X ? start.X - end.X : end.X - start.X + start.Y > end.Y ? start.Y - end.Y : end.Y - start.Y;
-    }
-    /// <summary>
     /// ダイクストラ法の範囲検索で足跡を付ける
     /// </summary>
     /// <param name="startPoint">開始地点</param>
@@ -429,7 +353,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         foreach (var point in MapData)
         {
             point.Footprints = START_FOOTPRINTS;
-            point.Parent = NG_POINT;
+            point.Parent = MapPoint.NG_POINT;
         }
         FootprintsPoints.Clear();
         this[startPoint].Footprints = movePower;
@@ -451,7 +375,7 @@ public class SearchMap : IEnumerable<SearchMap.Point>
             point.TotalCost = 0;
             point.Cost = 0;
             point.Footprints = START_FOOTPRINTS;
-            point.Parent = NG_POINT;
+            point.Parent = MapPoint.NG_POINT;
         }
         //探索開始
         this[start].State = SearchStateType.Close;
@@ -476,21 +400,21 @@ public class SearchMap : IEnumerable<SearchMap.Point>
     /// <returns></returns>
     public IEnumerable<Point> GetNeighorMap(Point point)
     {
-        if (point.Y > 0 && point.Y < MAX_Y)//上
+        if (point.Up.CheckInMapPoint(MAX_X, MAX_Y, out var next) != MapPoint.NG_POINT)//上
         {
-            yield return this[point.X, point.Y - 1];
+            yield return this[next];
         }
-        if (point.Y >= 0 && point.Y < MAX_Y - 1)//下
+        if (point.Down.CheckInMapPoint(MAX_X, MAX_Y, out next) != MapPoint.NG_POINT)//下
         {
-            yield return this[point.X, point.Y + 1];
+            yield return this[next];
         }
-        if (point.X > 0 && point.X < MAX_X)//右
+        if (point.Right.CheckInMapPoint(MAX_X,MAX_Y,out next) != MapPoint.NG_POINT)//右
         {
-            yield return this[point.X - 1, point.Y];
+            yield return this[next];
         }
-        if (point.X >= 0 && point.X < MAX_X - 1)//左
+        if (point.Left.CheckInMapPoint(MAX_X, MAX_Y, out next) != MapPoint.NG_POINT)//左
         {
-            yield return this[point.X + 1, point.Y];
+            yield return this[next];
         }
     }
     /// <summary>
@@ -503,7 +427,9 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         while (true)
         {
             yield return this[targetPoint].Pos;
-            if (this[targetPoint].Parent == NG_POINT) { break; }
+            //親座標がなければ開始地点のため終了する
+            if (this[targetPoint].Parent == MapPoint.NG_POINT) { break; }
+            //目標を親座標に更新する
             targetPoint = this[targetPoint].Parent;
         }
     }
