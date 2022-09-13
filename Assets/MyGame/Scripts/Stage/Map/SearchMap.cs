@@ -428,7 +428,10 @@ public class SearchMap : IEnumerable<SearchMap.Point>
         {
             yield return this[targetPoint].Pos;
             //親座標がなければ開始地点のため終了する
-            if (this[targetPoint].Parent == MapPoint.NG_POINT) { break; }
+            if (this[targetPoint].Parent == MapPoint.NG_POINT) 
+            {
+                yield break; 
+            }
             //目標を親座標に更新する
             targetPoint = this[targetPoint].Parent;
         }
